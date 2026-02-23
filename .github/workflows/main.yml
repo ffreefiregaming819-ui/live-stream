@@ -1,23 +1,22 @@
-name: YouTube_24-7_Stream
+name: YouTube_24-7_Stream_Bot
 on:
   schedule:
-    - cron: '0 */6 * * *' 
-  workflow_dispatch: 
+    - cron: '0 */6 * * *' # यह हर 6 घंटे में खुद को जगाएगा
+  workflow_dispatch: # आपके वेबसाइट पर बटन दबाते ही शुरू करने के लिए
 
 jobs:
   stream:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch and Stream
+      - name: Auto-Fetch and Live
         run: |
-          # आपकी वेबसाइट से डेटा उठाना
-          INFO=$(curl -s "https://dsrblackpanel.xo.je/get_data.php")
+          # यह लाइन आपकी वेबसाइट से वीडियो का नया लिंक और की (Key) लाएगी
+          INFO=$(curl -s "https://your-website.com/get_data.php")
           V_URL=$(echo $INFO | cut -d'|' -f1)
           S_KEY=$(echo $INFO | cut -d'|' -f2)
           
-          # यूट्यूब पर ब्रॉडकास्ट भेजना
+          # यह असली जादू है जो यूट्यूब को वीडियो भेजता है
           ffmpeg -re -stream_loop -1 -i "$V_URL" \
           -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3000k -bufsize 6000k \
           -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 \
           -f flv "rtmp://a.rtmp.youtube.com/live2/$S_KEY"
-          
